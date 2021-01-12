@@ -1,0 +1,38 @@
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, windows-latest]
+    runs-on: ${{ matrix.os }}
+    name: Dotnet Build and Test for ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Dotnet 2
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '2.1.x'
+      - name: Setup Dotnet 3
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.x'
+      - name: Setup Dotnet 5
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '5.0.x'
+      - name: Dotnet Build Net Standard 2.0
+        run: dotnet build src/CsvHelper -f netstandard2.0
+      - name: Dotnet Build Net Standard 2.1
+        run: dotnet build src/CsvHelper -f netstandard2.1
+      - name: Dotnet Build Net 5
+        run: dotnet build src/CsvHelper -f net50
+      - name: Net Build Framework 4.5
+        if: ${{ matrix.os == 'windows-latest'}}
+        run: echo "Will build on windows only"
+      - name: Net Build Framework 4.7
+        if: ${{ matrix.os == 'windows-latest'}}
+        run: echo "Will build on windows only"
+      - name: Test Net 5.0
+        run: dotnet test -f net50
